@@ -5,7 +5,7 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --font-sans: var(--font-noto-kr), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-inter), var(--font-noto-kr), 'Airbnb Cereal VF', Circular, -apple-system, system-ui, Roboto, 'Helvetica Neue', sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
   --color-ring: var(--ring);
   --color-input: var(--input);
@@ -26,37 +26,71 @@
   --color-foreground: var(--foreground);
   --color-background: var(--background);
   --color-ticket: var(--ticket);
-  --radius-sm: calc(var(--radius) * 0.6);
-  --radius-md: calc(var(--radius) * 0.8);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) * 1.4);
-  --radius-2xl: calc(var(--radius) * 1.8);
-  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-xs: 4px;
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 32px;
+  --radius-2xl: 32px;
+  --radius-3xl: 9999px;
 }
 
-/* Boarding-pass palette: deep navy ink, warm paper, signal orange */
+/* Airbnb Design System Tokens (DESIGN-airbnb.md) */
 :root {
   color-scheme: light;
-  --background: oklch(0.955 0.012 85);
-  --foreground: oklch(0.24 0.06 262);
-  --card: oklch(0.99 0.006 85);
-  --card-foreground: oklch(0.24 0.06 262);
-  --ticket: oklch(0.99 0.006 85);
-  --popover: oklch(0.99 0.006 85);
-  --popover-foreground: oklch(0.24 0.06 262);
-  --primary: oklch(0.27 0.07 262);
-  --primary-foreground: oklch(0.98 0.006 85);
-  --secondary: oklch(0.91 0.016 85);
-  --secondary-foreground: oklch(0.24 0.06 262);
-  --muted: oklch(0.92 0.014 85);
-  --muted-foreground: oklch(0.47 0.03 262);
-  --accent: oklch(0.67 0.19 38);
-  --accent-foreground: oklch(0.99 0.006 85);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.86 0.02 85);
-  --input: oklch(0.86 0.02 85);
-  --ring: oklch(0.67 0.19 38);
-  --radius: 0.75rem;
+  /* Surface */
+  --canvas: #ffffff;
+  --surface-soft: #f7f7f7;
+  --surface-card: #ffffff;
+  --surface-strong: #f2f2f2;
+
+  /* Brand & Accent */
+  --rausch: #ff385c;
+  --rausch-active: #e00b41;
+  --rausch-disabled: #ffd1da;
+  --luxe: #460479;
+  --plus: #92174d;
+
+  /* Text */
+  --ink: #222222;
+  --body-copy: #3f3f3f;
+  --muted-copy: #6a6a6a;
+  --muted-soft: #929292;
+  --on-primary: #ffffff;
+  --on-dark: #ffffff;
+  --legal-link: #428bff;
+  --error-text: #c13515;
+  --error-text-hover: #b32505;
+
+  /* Hairlines & Borders */
+  --hairline: #dddddd;
+  --hairline-soft: #ebebeb;
+  --border-strong: #c1c1c1;
+
+  /* Shadcn/Tailwind Mapping */
+  --background: #ffffff;
+  --foreground: #222222;
+  --card: #ffffff;
+  --card-foreground: #222222;
+  --ticket: #ffffff;
+  --popover: #ffffff;
+  --popover-foreground: #222222;
+  --primary: #ff385c;
+  --primary-foreground: #ffffff;
+  --secondary: #f2f2f2;
+  --secondary-foreground: #222222;
+  --muted: #f7f7f7;
+  --muted-foreground: #6a6a6a;
+  --accent: #ff385c;
+  --accent-foreground: #ffffff;
+  --destructive: #c13515;
+  --border: #dddddd;
+  --input: #dddddd;
+  --ring: #222222;
+  --radius: 14px;
+
+  /* Single Airbnb Elevation Tier */
+  --shadow-airbnb: rgba(0, 0, 0, 0.02) 0 0 0 1px, rgba(0, 0, 0, 0.04) 0 2px 6px 0, rgba(0, 0, 0, 0.1) 0 4px 8px 0;
 }
 
 @layer base {
@@ -64,6 +98,118 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground font-sans;
+    @apply bg-background text-foreground font-sans antialiased;
+    color: var(--ink);
+    background-color: var(--surface-soft);
   }
+}
+
+/* Single Shadow Utility */
+.shadow-airbnb {
+  box-shadow: var(--shadow-airbnb);
+}
+
+/* Airbnb Typography Hierarchy Utilities (DESIGN-airbnb.md) */
+.ty-rating-display {
+  font-size: 64px;
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -1px;
+}
+.ty-display-xl {
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1.4;
+  letter-spacing: 0;
+}
+.ty-display-lg {
+  font-size: 22px;
+  font-weight: 500;
+  line-height: 1.18;
+  letter-spacing: -0.44px;
+}
+.ty-display-md {
+  font-size: 21px;
+  font-weight: 700;
+  line-height: 1.4;
+  letter-spacing: 0;
+}
+.ty-display-sm {
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.18px;
+}
+.ty-title-md {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: 0;
+}
+.ty-title-sm {
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.25;
+  letter-spacing: 0;
+}
+.ty-body-md {
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.5;
+  letter-spacing: 0;
+}
+.ty-body-sm {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.43;
+  letter-spacing: 0;
+}
+.ty-caption {
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.29;
+  letter-spacing: 0;
+}
+.ty-caption-sm {
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.23;
+  letter-spacing: 0;
+}
+.ty-badge {
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.18;
+  letter-spacing: 0;
+}
+.ty-micro-label {
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.33;
+  letter-spacing: 0;
+}
+.ty-uppercase-tag {
+  font-size: 8px;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: 0.32px;
+  text-transform: uppercase;
+}
+.ty-button-md {
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.25;
+  letter-spacing: 0;
+}
+.ty-button-sm {
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.29;
+  letter-spacing: 0;
+}
+.ty-nav-link {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: 0;
 }

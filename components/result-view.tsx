@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Download, Info, RotateCcw } from 'lucide-react'
+import { ArrowLeft, Download, Info, RotateCcw } from 'lucide-react'
 import { toPng } from 'html-to-image'
 import { BoardingPass } from '@/components/boarding-pass'
 import { useTrip } from '@/components/trip-provider'
@@ -46,21 +46,40 @@ export function ResultView() {
   }
 
   return (
-    <main className="flex min-h-dvh flex-col gap-4 px-2 pt-6 pb-10">
+    <main className="flex min-h-dvh flex-col gap-4 bg-[#ffffff] px-3 pt-4 pb-10 text-[#222222]">
+      {/* Airbnb Detail Toolbar (icon-button-circle #f2f2f2 32px) */}
+      <div className="flex items-center justify-between px-3 pb-1">
+        <button
+          type="button"
+          onClick={handleRetry}
+          aria-label="조건 다시 선택하기"
+          className="flex size-8 items-center justify-center rounded-full bg-[#f2f2f2] text-[#222222] transition-colors hover:bg-[#dddddd]"
+        >
+          <ArrowLeft className="size-4" aria-hidden="true" />
+        </button>
+        <span className="ty-caption font-semibold text-[#222222]">AI 보딩패스 발권 완료</span>
+        <span className="size-8" aria-hidden="true" />
+      </div>
+
       <h1 className="sr-only">{`추천 결과: ${result.recommendation.country}`}</h1>
-      <p className="mx-3 flex items-start gap-2 rounded-lg bg-muted px-3 py-2.5 text-xs leading-relaxed text-muted-foreground">
-        <Info className="mt-0.5 size-3.5 shrink-0" aria-hidden="true" />
-        카톡·인스타 앱 내에서 저장이 안 된다면, 외부 브라우저(크롬·사파리)로 열어 저장해 주세요.
+
+      {/* In-App Browser Guidance Notice */}
+      <p className="ty-caption-sm mx-3 flex items-start gap-2.5 rounded-[14px] border border-[#ebebeb] bg-[#f7f7f7] px-4 py-3 leading-[1.45] text-[#6a6a6a]">
+        <Info className="mt-0.5 size-4 shrink-0 text-[#222222]" aria-hidden="true" />
+        <span>
+          카톡·인스타 앱 내에서 저장이 안 된다면, 외부 브라우저(크롬·사파리)로 열어 저장해 주세요.
+        </span>
       </p>
 
       <BoardingPass ref={cardRef} input={result.input} recommendation={result.recommendation} issuedAt={issuedAt} />
 
-      <div className="flex flex-col gap-2.5 px-3">
+      {/* Action Buttons: button-primary (#ff385c) & button-secondary (#ffffff + 1px #222222) */}
+      <div className="flex flex-col gap-2.5 px-3 pt-1">
         <button
           type="button"
           onClick={handleSave}
           disabled={saving}
-          className="flex h-14 items-center justify-center gap-2 rounded-xl bg-accent text-base font-bold text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:opacity-60"
+          className="ty-button-md flex h-12 items-center justify-center gap-2 rounded-[8px] bg-[#ff385c] px-6 py-3.5 text-[#ffffff] transition-colors active:bg-[#e00b41] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#222222] focus-visible:ring-offset-2 disabled:bg-[#ffd1da]"
         >
           <Download className="size-5" aria-hidden="true" />
           {saving ? '저장 중...' : '보딩패스 이미지 저장'}
@@ -68,7 +87,7 @@ export function ResultView() {
         <button
           type="button"
           onClick={handleRetry}
-          className="flex h-12 items-center justify-center gap-2 rounded-xl border border-primary/20 bg-card text-[15px] font-bold text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="ty-button-md flex h-12 items-center justify-center gap-2 rounded-[8px] border border-[#222222] bg-[#ffffff] px-6 py-3 text-[#222222] transition-colors hover:bg-[#f7f7f7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#222222]"
         >
           <RotateCcw className="size-4" aria-hidden="true" />
           다시 추천받기

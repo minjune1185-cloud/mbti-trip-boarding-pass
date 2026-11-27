@@ -36,7 +36,7 @@ export function TripProvider({ children }: { children: React.ReactNode }) {
         {toast && (
           <p
             key={toast.id}
-            className="max-w-[390px] rounded-xl bg-primary px-4 py-3 text-center text-sm font-medium leading-relaxed text-primary-foreground shadow-lg animate-in fade-in slide-in-from-bottom-4"
+            className="max-w-[390px] rounded-[14px] bg-[#222222] px-4 py-3 text-center text-[14px] font-medium leading-[1.43] text-[#ffffff] shadow-airbnb animate-in fade-in slide-in-from-bottom-4"
           >
             {toast.message}
           </p>

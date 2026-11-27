@@ -2,7 +2,7 @@
 
 import { useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Ticket } from 'lucide-react'
+import { RotateCcw, Search, Ticket } from 'lucide-react'
 import { ChoiceGroup } from '@/components/choice-group'
 import { LoadingOverlay } from '@/components/loading-overlay'
 import { useTrip } from '@/components/trip-provider'
@@ -26,6 +26,30 @@ import type { ApiErrorCode, Recommendation } from '@/lib/schema'
 
 const TEMP_ERROR_MESSAGE = '일시적인 오류가 발생했어요. 잠시 후 다시 시도해 주세요.'
 
+const STYLE_ICONS: Record<TravelStyle, string> = {
+  '휴양·호캉스': '🏖️',
+  '맛집·먹방': '🍜',
+  '관광·랜드마크': '🏛️',
+  '쇼핑·도시': '🛍️',
+  '액티비티·자연': '⛰️',
+}
+
+const STYLE_DESC: Record<TravelStyle, string> = {
+  '휴양·호캉스': '수영장 · 리조트 힐링',
+  '맛집·먹방': '야시장 · 로컬 미식 투어',
+  '관광·랜드마크': '인생샷 · 필수 명소 정복',
+  '쇼핑·도시': '트렌디 스팟 · 시티 라이프',
+  '액티비티·자연': '대자연 · 다이내믹 체험',
+}
+
+const COMPANION_ICONS: Record<Companion, string> = {
+  혼자: '🧳',
+  '친구(텐션 높음)': '🪩',
+  '친구(힐링)': '🍵',
+  연인: '💑',
+  가족: '👨‍👩‍👧‍👦',
+}
+
 export function TripForm() {
   const router = useRouter()
   const { setResult, showToast } = useTrip()
@@ -39,17 +63,44 @@ export function TripForm() {
   const inFlight = useRef(false)
 
   const needsCompanionMbti = companion !== null && companion !== SOLO
-  const isComplete =
-    travelStyle && myMbti && budget && duration && companion && (!needsCompanionMbti || companionMbti)
+  const totalRequired = needsCompanionMbti ? 6 : 5
+  const completedCount = [
+    travelStyle,
+    myMbti,
+    budget,
+    duration,
+    companion,
+    ...(needsCompanionMbti ? [companionMbti] : []),
+  ].filter(Boolean).length
+
+  const isComplete = Boolean(
+    travelStyle &&
+      myMbti &&
+      budget &&
+      duration &&
+      companion &&
+      (!needsCompanionMbti || companionMbti),
+  )
 
   const handleCompanion = (value: Companion) => {
     setCompanion(value)
     if (value === SOLO) setCompanionMbti(null)
   }
 
+  const handleResetAll = () => {
+    setTravelStyle(null)
+    setMyMbti(null)
+    setBudget(null)
+    setDuration(null)
+    setCompanion(null)
+    setCompanionMbti(null)
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    if (!isComplete || inFlight.current) return
+    if (!isComplete || !travelStyle || !myMbti || !budget || !duration || !companion || inFlight.current) {
+      return
+    }
 
     const payload: InputPayload = {
       travel_style: travelStyle,
@@ -90,77 +141,170 @@ export function TripForm() {
 
   return (
     <>
-      <form onSubmit={handleSubmit} className="flex flex-col gap-8 px-5 pb-6" noValidate>
+      <form onSubmit={handleSubmit} className="flex flex-col gap-7 px-6 pt-4 pb-6" noValidate>
+        {/* Airbnb Signature Global Search Bar Pill (64px height, 3 segments, 48x48px Rausch Search Orb) */}
+        <div
+          aria-label="선택된 여행 조건 요약"
+          className="flex h-16 items-center justify-between rounded-full border border-[#dddddd] bg-[#ffffff] py-2 pr-2 pl-5 shadow-airbnb"
+        >
+          <div className="grid flex-1 grid-cols-3 divide-x divide-[#dddddd] pr-2">
+            <div className="flex min-w-0 flex-col pr-2.5">
+              <span className="ty-micro-label text-[11px] text-[#222222]">어디로</span>
+              <span className="ty-caption-sm truncate text-[12px] text-[#6a6a6a]">
+                {travelStyle ?? '스타일 선택'}
+              </span>
+            </div>
+            <div className="flex min-w-0 flex-col px-2.5">
+              <span className="ty-micro-label text-[11px] text-[#222222]">일정 · 예산</span>
+              <span className="ty-caption-sm truncate text-[12px] text-[#6a6a6a]">
+                {duration || budget
+                  ? [duration, budget].filter(Boolean).join(' · ')
+                  : '기간 · 예산'}
+              </span>
+            </div>
+            <div className="flex min-w-0 flex-col pl-2.5">
+              <span className="ty-micro-label text-[11px] text-[#222222]">누구와</span>
+              <span className="ty-caption-sm truncate text-[12px] text-[#6a6a6a]">
+                {myMbti || companion
+                  ? [myMbti, companion].filter(Boolean).join(' · ')
+                  : 'MBTI · 동행'}
+              </span>
+            </div>
+          </div>
+          <button
+            type="submit"
+            disabled={!isComplete || submitting}
+            aria-label="선택한 조건으로 보딩패스 발권"
+            className="flex size-12 shrink-0 items-center justify-center rounded-full bg-[#ff385c] text-[#ffffff] transition-colors active:bg-[#e00b41] disabled:cursor-not-allowed disabled:bg-[#ffd1da]"
+          >
+            <Search className="size-4 stroke-[2.5]" aria-hidden="true" />
+          </button>
+        </div>
+
+        {/* 01. Travel Style - Airbnb Icon Cards */}
         <ChoiceGroup
           name="travel_style"
           step="01"
           legend="여행 스타일"
+          subtitle="가장 끌리는 여행 테마 1가지를 골라주세요"
           options={TRAVEL_STYLES}
           value={travelStyle}
           onChange={setTravelStyle}
           columns={2}
+          variant="card-icon"
+          iconMap={STYLE_ICONS}
+          descMap={STYLE_DESC}
         />
+
+        {/* 02. My MBTI - Airbnb Calendar-style Ink Invert Tiles */}
         <ChoiceGroup
           name="my_mbti"
           step="02"
           legend="본인 MBTI"
+          subtitle="성향에 딱 맞는 밈과 여행지를 매칭해 드려요"
           options={MBTI_TYPES}
           value={myMbti}
           onChange={setMyMbti}
           columns={4}
           mono
+          variant="mbti-tile"
         />
+
+        {/* 03. Budget - Airbnb Filter Pills */}
         <ChoiceGroup
           name="budget"
           step="03"
           legend="예산 (1인)"
+          subtitle="항공권과 숙소를 포함한 현실적인 예산 구간"
           options={BUDGETS}
           value={budget}
           onChange={setBudget}
-          columns={3}
+          variant="pill"
         />
+
+        {/* 04. Duration - Airbnb Filter Pills */}
         <ChoiceGroup
           name="duration"
           step="04"
           legend="기간"
+          subtitle="일정에 무리 없는 비행 거리의 국가를 골라드려요"
           options={DURATIONS}
           value={duration}
           onChange={setDuration}
-          columns={2}
+          variant="pill"
         />
+
+        {/* 05. Companion - Airbnb Icon Pills */}
         <ChoiceGroup
           name="companion"
           step="05"
           legend="동행자"
+          subtitle="동행자와의 케미를 보딩패스에 녹여드려요"
           options={COMPANIONS}
           value={companion}
           onChange={handleCompanion}
-          columns={3}
+          variant="pill"
+          iconMap={COMPANION_ICONS}
         />
+
+        {/* 06. Companion MBTI - Conditional Ink Invert Tiles */}
         {needsCompanionMbti && (
           <ChoiceGroup
             name="companion_mbti"
             step="06"
             legend="동행자 MBTI"
+            subtitle="잘 모르시면 '모름'을 선택해도 재미있게 발권돼요"
             options={COMPANION_MBTI_TYPES}
             value={companionMbti}
             onChange={setCompanionMbti}
             columns={4}
             mono
+            variant="mbti-tile"
           />
         )}
 
-        <div className="sticky bottom-0 -mx-5 flex flex-col gap-2 border-t border-border bg-background/95 px-5 pt-3 pb-4 backdrop-blur">
-          {!isComplete && (
-            <p className="text-center text-xs font-medium text-muted-foreground" id="submit-hint">
-              모든 조건을 선택하면 발권할 수 있어요
-            </p>
-          )}
+        {/* Airbnb Sticky Bottom Reservation Bar */}
+        <div className="sticky bottom-0 -mx-6 flex flex-col gap-2.5 border-t border-[#dddddd] bg-[#ffffff]/95 px-6 pt-3.5 pb-4 backdrop-blur">
+          <div className="flex items-center justify-between">
+            <div className="flex flex-col">
+              <div className="flex items-baseline gap-1.5">
+                <span className="ty-title-md text-[#222222]">
+                  {isComplete ? '발권 준비 완료' : `${completedCount} / ${totalRequired} 조건 선택됨`}
+                </span>
+                {myMbti && (
+                  <span className="font-mono text-[12px] font-semibold text-[#6a6a6a]">
+                    · {myMbti}
+                  </span>
+                )}
+              </div>
+              {!isComplete ? (
+                <p className="ty-caption-sm text-[12px] text-[#6a6a6a]" id="submit-hint">
+                  모든 조건을 선택하면 발권할 수 있어요
+                </p>
+              ) : (
+                <p className="ty-caption-sm truncate text-[12px] text-[#6a6a6a]">
+                  {[travelStyle, duration, companion].filter(Boolean).join(' · ')}
+                </p>
+              )}
+            </div>
+
+            {completedCount > 0 && (
+              <button
+                type="button"
+                onClick={handleResetAll}
+                className="ty-caption-sm inline-flex items-center gap-1 font-medium text-[#222222] underline underline-offset-4 hover:text-[#6a6a6a]"
+              >
+                <RotateCcw className="size-3.5" aria-hidden="true" />
+                초기화
+              </button>
+            )}
+          </div>
+
           <button
             type="submit"
             disabled={!isComplete || submitting}
             aria-describedby={!isComplete ? 'submit-hint' : undefined}
-            className="flex h-14 w-full items-center justify-center gap-2 rounded-xl bg-accent text-base font-bold text-accent-foreground shadow-sm transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:bg-muted disabled:text-muted-foreground disabled:shadow-none"
+            className="ty-button-md flex h-12 w-full items-center justify-center gap-2 rounded-[8px] bg-[#ff385c] px-6 py-3.5 text-[#ffffff] transition-colors active:bg-[#e00b41] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#222222] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:bg-[#ffd1da] disabled:text-[#ffffff]"
           >
             <Ticket className="size-5" aria-hidden="true" />
             내 여행지 보딩패스 발권하기

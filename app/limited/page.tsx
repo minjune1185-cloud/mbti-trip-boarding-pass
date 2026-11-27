@@ -21,7 +21,7 @@ export default function LimitedPage() {
     >
       <Link
         href="/"
-        className="flex h-14 w-full items-center justify-center rounded-xl bg-primary text-base font-bold text-primary-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+        className="ty-button-md flex h-12 w-full items-center justify-center rounded-[8px] bg-[#ff385c] px-6 py-3.5 text-[#ffffff] transition-colors active:bg-[#e00b41] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#222222] focus-visible:ring-offset-2"
       >
         처음으로 돌아가기
       </Link>

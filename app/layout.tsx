@@ -1,12 +1,18 @@
 import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
-import { Geist_Mono, Noto_Sans_KR } from 'next/font/google'
+import { Geist_Mono, Inter, Noto_Sans_KR } from 'next/font/google'
 import { TripProvider } from '@/components/trip-provider'
 import './globals.css'
 
+const inter = Inter({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+  variable: '--font-inter',
+})
+
 const notoKr = Noto_Sans_KR({
   subsets: ['latin'],
-  weight: ['400', '500', '700', '900'],
+  weight: ['400', '500', '600', '700'],
   variable: '--font-noto-kr',
 })
 
@@ -31,15 +37,15 @@ export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   colorScheme: 'light',
-  themeColor: '#f3efe6',
+  themeColor: '#ffffff',
 }
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="ko" className={`${notoKr.variable} ${geistMono.variable}`}>
-      <body className="antialiased">
+    <html lang="ko" className={`${inter.variable} ${notoKr.variable} ${geistMono.variable}`}>
+      <body className="bg-[#f7f7f7] text-[#222222] antialiased">
         <TripProvider>
-          <div className="mx-auto min-h-dvh w-full max-w-[430px] bg-background md:shadow-[0_0_0_1px_var(--border)]">
+          <div className="mx-auto min-h-dvh w-full max-w-[430px] bg-[#ffffff] md:shadow-airbnb">
             {children}
           </div>
         </TripProvider>
