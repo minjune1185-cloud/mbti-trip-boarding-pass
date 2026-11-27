@@ -1,4 +1,5 @@
 import { Plane } from 'lucide-react'
+import { GuestbookSection } from '@/components/guestbook-section'
 import { TripForm } from '@/components/trip-form'
 
 export default function Page() {
@@ -51,6 +52,9 @@ export default function Page() {
       </section>
 
       <TripForm />
+
+      {/* Anonymous Guestbook powered by Vercel Neon Postgres */}
+      <GuestbookSection />
 
       {/* Airbnb Light Footer & Legal Band */}
       <footer className="mt-auto border-t border-[#dddddd] bg-[#ffffff] px-6 py-8">

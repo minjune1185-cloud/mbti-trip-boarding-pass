@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { ArrowLeft, Download, Info, RotateCcw } from 'lucide-react'
 import { toPng } from 'html-to-image'
 import { BoardingPass } from '@/components/boarding-pass'
+import { GuestbookSection } from '@/components/guestbook-section'
 import { useTrip } from '@/components/trip-provider'
 import { findCountry } from '@/lib/countries'
 
@@ -92,6 +93,13 @@ export function ResultView() {
           <RotateCcw className="size-4" aria-hidden="true" />
           다시 추천받기
         </button>
+      </div>
+
+      <div className="mt-4">
+        <GuestbookSection
+          defaultMbti={result.input.my_mbti}
+          defaultCountry={result.recommendation.country}
+        />
       </div>
     </main>
   )
