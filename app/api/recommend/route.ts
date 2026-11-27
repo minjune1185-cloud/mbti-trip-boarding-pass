@@ -1,3 +1,4 @@
+import { createGoogleGenerativeAI } from '@ai-sdk/google'
 import { generateText, Output } from 'ai'
 import { COUNTRIES } from '@/lib/countries'
 import { inputPayloadSchema, recommendationSchema, type ApiErrorCode } from '@/lib/schema'
@@ -11,7 +12,21 @@ import {
 
 export const maxDuration = 30
 
-const MODEL = 'google/gemini-3.5-flash'
+const MODEL_ID = process.env.GEMINI_MODEL || 'gemini-3.5-flash-lite'
+
+function getGeminiModel() {
+  const apiKey =
+    process.env.GOOGLE_GENERATIVE_AI_API_KEY ||
+    process.env.GEMINI_API_KEY ||
+    process.env.GOOGLE_API_KEY
+
+  if (apiKey) {
+    const google = createGoogleGenerativeAI({ apiKey })
+    return google(MODEL_ID.replace(/^google\//, ''))
+  }
+
+  return `google/${MODEL_ID.replace(/^google\//, '')}`
+}
 
 const SYSTEM = `너는 한국 MZ 감성 여행 밈 큐레이터야. 사용자의 여행 조건과 MBTI 조합을 보고 아래 30개국 중 딱 1곳을 골라 밈 말투로 추천해.
 
@@ -61,7 +76,7 @@ export async function POST(req: Request) {
 
   try {
     const { output } = await generateText({
-      model: MODEL,
+      model: getGeminiModel(),
       system: SYSTEM,
       prompt,
       output: Output.object({ schema: recommendationSchema }),
