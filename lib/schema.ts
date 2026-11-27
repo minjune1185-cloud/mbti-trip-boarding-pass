@@ -6,6 +6,7 @@ import {
   COMPANION_MBTI_TYPES,
   DURATIONS,
   MBTI_TYPES,
+  SAFETY_LEVELS,
   SOLO,
   TRAVEL_STYLES,
 } from './options'
@@ -16,6 +17,7 @@ export const inputPayloadSchema = z
     my_mbti: z.enum(MBTI_TYPES),
     budget: z.enum(BUDGETS),
     duration: z.enum(DURATIONS),
+    safety_level: z.enum(SAFETY_LEVELS),
     companion: z.enum(COMPANIONS),
     companion_mbti: z.enum(COMPANION_MBTI_TYPES).nullable(),
   })

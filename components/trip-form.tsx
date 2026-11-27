@@ -12,6 +12,7 @@ import {
   COMPANION_MBTI_TYPES,
   DURATIONS,
   MBTI_TYPES,
+  SAFETY_LEVELS,
   SOLO,
   TRAVEL_STYLES,
   type Budget,
@@ -20,6 +21,7 @@ import {
   type Duration,
   type InputPayload,
   type Mbti,
+  type SafetyLevel,
   type TravelStyle,
 } from '@/lib/options'
 import type { ApiErrorCode, Recommendation } from '@/lib/schema'
@@ -42,6 +44,12 @@ const STYLE_DESC: Record<TravelStyle, string> = {
   '액티비티·자연': '대자연 · 다이내믹 체험',
 }
 
+const SAFETY_ICONS: Record<SafetyLevel, string> = {
+  '치안 최우선': '🛡️',
+  '보통(무난)': '⚖️',
+  '모험 가능': '🔥',
+}
+
 const COMPANION_ICONS: Record<Companion, string> = {
   혼자: '🧳',
   '친구(텐션 높음)': '🪩',
@@ -50,7 +58,7 @@ const COMPANION_ICONS: Record<Companion, string> = {
   가족: '👨‍👩‍👧‍👦',
 }
 
-type StepIndex = 1 | 2 | 3 | 4 | 5 | 6
+type StepIndex = 1 | 2 | 3 | 4 | 5 | 6 | 7
 
 export function TripForm() {
   const router = useRouter()
@@ -59,6 +67,7 @@ export function TripForm() {
   const [myMbti, setMyMbti] = useState<Mbti | null>(null)
   const [budget, setBudget] = useState<Budget | null>(null)
   const [duration, setDuration] = useState<Duration | null>(null)
+  const [safetyLevel, setSafetyLevel] = useState<SafetyLevel | null>(null)
   const [companion, setCompanion] = useState<Companion | null>(null)
   const [companionMbti, setCompanionMbti] = useState<CompanionMbti | null>(null)
   const [activeStep, setActiveStep] = useState<StepIndex | 'all'>(1)
@@ -66,12 +75,13 @@ export function TripForm() {
   const inFlight = useRef(false)
 
   const needsCompanionMbti = companion !== null && companion !== SOLO
-  const totalRequired = needsCompanionMbti ? 6 : 5
+  const totalRequired = needsCompanionMbti ? 7 : 6
   const completedCount = [
     travelStyle,
     myMbti,
     budget,
     duration,
+    safetyLevel,
     companion,
     ...(needsCompanionMbti ? [companionMbti] : []),
   ].filter(Boolean).length
@@ -81,6 +91,7 @@ export function TripForm() {
       myMbti &&
       budget &&
       duration &&
+      safetyLevel &&
       companion &&
       (!needsCompanionMbti || companionMbti),
   )
@@ -102,7 +113,12 @@ export function TripForm() {
 
   const handleSelectDuration = (val: Duration) => {
     setDuration(val)
-    if (!companion) setActiveStep(5)
+    if (!safetyLevel) setActiveStep(5)
+  }
+
+  const handleSelectSafety = (val: SafetyLevel) => {
+    setSafetyLevel(val)
+    if (!companion) setActiveStep(6)
   }
 
   const handleCompanion = (value: Companion) => {
@@ -110,7 +126,7 @@ export function TripForm() {
     if (value === SOLO) {
       setCompanionMbti(null)
     } else {
-      setActiveStep(6)
+      setActiveStep(7)
     }
   }
 
@@ -123,6 +139,7 @@ export function TripForm() {
     setMyMbti(null)
     setBudget(null)
     setDuration(null)
+    setSafetyLevel(null)
     setCompanion(null)
     setCompanionMbti(null)
     setActiveStep(1)
@@ -136,7 +153,16 @@ export function TripForm() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    if (!isComplete || !travelStyle || !myMbti || !budget || !duration || !companion || inFlight.current) {
+    if (
+      !isComplete ||
+      !travelStyle ||
+      !myMbti ||
+      !budget ||
+      !duration ||
+      !safetyLevel ||
+      !companion ||
+      inFlight.current
+    ) {
       return
     }
 
@@ -145,6 +171,7 @@ export function TripForm() {
       my_mbti: myMbti,
       budget,
       duration,
+      safety_level: safetyLevel,
       companion,
       companion_mbti: needsCompanionMbti ? companionMbti : null,
     }
@@ -188,12 +215,14 @@ export function TripForm() {
           <div className="grid flex-1 grid-cols-3 divide-x divide-[#dddddd] pr-2">
             <button
               type="button"
-              onClick={() => setActiveStep(1)}
+              onClick={() => setActiveStep(travelStyle ? 5 : 1)}
               className="flex min-w-0 flex-col pr-2.5 text-left focus-visible:outline-none"
             >
-              <span className="ty-micro-label text-[11px] text-[#222222]">어디로</span>
+              <span className="ty-micro-label text-[11px] text-[#222222]">어디로 · 치안</span>
               <span className="ty-caption-sm truncate text-[12px] text-[#6a6a6a]">
-                {travelStyle ?? '스타일 선택'}
+                {travelStyle || safetyLevel
+                  ? [travelStyle, safetyLevel].filter(Boolean).join(' · ')
+                  : '스타일 · 치안'}
               </span>
             </button>
             <button
@@ -210,7 +239,7 @@ export function TripForm() {
             </button>
             <button
               type="button"
-              onClick={() => setActiveStep(myMbti ? 5 : 2)}
+              onClick={() => setActiveStep(myMbti ? 6 : 2)}
               className="flex min-w-0 flex-col pl-2.5 text-left focus-visible:outline-none"
             >
               <span className="ty-micro-label text-[11px] text-[#222222]">누구와</span>
@@ -310,10 +339,26 @@ export function TripForm() {
           onToggle={() => toggleStep(4)}
         />
 
-        {/* 05. Companion - Airbnb Icon Pills */}
+        {/* 05. Safety Level - Airbnb Icon Pills */}
+        <ChoiceGroup
+          name="safety_level"
+          step="05"
+          collapsedLabel="치안 중요도"
+          legend="여행지 치안은 얼마나 중요한가요?"
+          subtitle="밤거리 안전을 최우선으로 할지, 낭만과 모험을 즐길지 골라주세요"
+          options={SAFETY_LEVELS}
+          value={safetyLevel}
+          onChange={handleSelectSafety}
+          variant="pill"
+          iconMap={SAFETY_ICONS}
+          open={isStepOpen(5)}
+          onToggle={() => toggleStep(5)}
+        />
+
+        {/* 06. Companion - Airbnb Icon Pills */}
         <ChoiceGroup
           name="companion"
-          step="05"
+          step="06"
           collapsedLabel="동행자"
           legend="누구와 함께 떠나나요?"
           subtitle="동행자와의 케미를 보딩패스에 녹여드려요"
@@ -322,15 +367,15 @@ export function TripForm() {
           onChange={handleCompanion}
           variant="pill"
           iconMap={COMPANION_ICONS}
-          open={isStepOpen(5)}
-          onToggle={() => toggleStep(5)}
+          open={isStepOpen(6)}
+          onToggle={() => toggleStep(6)}
         />
 
-        {/* 06. Companion MBTI - Conditional Ink Invert Tiles */}
+        {/* 07. Companion MBTI - Conditional Ink Invert Tiles */}
         {needsCompanionMbti && (
           <ChoiceGroup
             name="companion_mbti"
-            step="06"
+            step="07"
             collapsedLabel="동행자 MBTI"
             legend="동행자의 MBTI도 알고 계신가요?"
             subtitle="잘 모르시면 '모름'을 선택해도 재미있게 발권돼요"
@@ -340,8 +385,8 @@ export function TripForm() {
             columns={4}
             mono
             variant="mbti-tile"
-            open={isStepOpen(6)}
-            onToggle={() => toggleStep(6)}
+            open={isStepOpen(7)}
+            onToggle={() => toggleStep(7)}
           />
         )}
 
@@ -365,7 +410,7 @@ export function TripForm() {
                 </p>
               ) : (
                 <p className="ty-caption-sm truncate text-[12px] text-[#6a6a6a]">
-                  {[travelStyle, duration, companion].filter(Boolean).join(' · ')}
+                  {[travelStyle, duration, safetyLevel, companion].filter(Boolean).join(' · ')}
                 </p>
               )}
             </div>

@@ -169,7 +169,7 @@ export const BoardingPass = forwardRef<HTMLDivElement, BoardingPassProps>(functi
           </div>
           <p className="ty-title-md mt-1 text-[#222222]">게스트 선호 여행지 매칭</p>
           <p className="ty-caption-sm mt-1 text-[#6a6a6a]">
-            {input.my_mbti} 성향과 예산·일정 조건에서 가장 높은 케미를 기록한 여행지예요
+            {input.my_mbti} 성향과 예산·치안·일정 조건에서 가장 높은 케미를 기록한 여행지예요
           </p>
 
           <div className="mt-4 grid w-full grid-cols-3 divide-x divide-[#ebebeb] rounded-[14px] border border-[#ebebeb] bg-[#f7f7f7] py-2.5">
@@ -181,9 +181,9 @@ export const BoardingPass = forwardRef<HTMLDivElement, BoardingPassProps>(functi
               </span>
             </div>
             <div className="flex flex-col items-center">
-              <span className="ty-micro-label text-[11px] text-[#6a6a6a]">성향 매칭</span>
-              <span className="mt-0.5 font-mono text-[13px] font-bold text-[#222222]">
-                {input.my_mbti}
+              <span className="ty-micro-label text-[11px] text-[#6a6a6a]">치안 기준</span>
+              <span className="mt-0.5 text-[13px] font-bold text-[#222222]">
+                {input.safety_level}
               </span>
             </div>
             <div className="flex flex-col items-center">
@@ -227,6 +227,8 @@ export const BoardingPass = forwardRef<HTMLDivElement, BoardingPassProps>(functi
             <Field label="BUDGET / PAX" value={input.budget} />
             <Field label="DURATION" value={input.duration} />
             <Field label="COMPANION" value={input.companion} />
+            <Field label="SAFETY LEVEL" value={input.safety_level} />
+            {input.companion_mbti && <Field label="COMPANION MBTI" value={input.companion_mbti} />}
           </dl>
 
           <div className="flex items-end justify-between gap-4 border-t border-[#dddddd] pt-4">
