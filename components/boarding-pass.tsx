@@ -20,7 +20,7 @@ function LaurelLeft() {
     <svg
       viewBox="0 0 32 64"
       fill="none"
-      className="h-14 w-7 shrink-0 text-[#222222]"
+      className="h-16 w-8 shrink-0 text-[#222222]"
       aria-hidden="true"
     >
       <path
@@ -42,7 +42,7 @@ function LaurelRight() {
     <svg
       viewBox="0 0 32 64"
       fill="none"
-      className="h-14 w-7 shrink-0 text-[#222222]"
+      className="h-16 w-8 shrink-0 text-[#222222]"
       aria-hidden="true"
     >
       <path
@@ -112,13 +112,13 @@ export const BoardingPass = forwardRef<HTMLDivElement, BoardingPassProps>(functi
               <span className="font-mono text-[10px] font-bold tracking-[0.18em] text-[#ffffff]/60">
                 FROM
               </span>
-              <span className="font-mono text-[36px] font-bold leading-none tracking-tight text-[#ffffff]">
+              <span className="font-mono text-[34px] font-bold leading-none tracking-tight text-[#ffffff]">
                 ICN
               </span>
               <span className="mt-1 text-[12px] font-normal text-[#ffffff]/75">대한민국</span>
             </div>
 
-            <div className="flex flex-1 flex-col items-center px-3 pb-3">
+            <div className="flex flex-1 flex-col items-center px-3 pb-2">
               <span className="mb-1.5 font-mono text-[10px] font-semibold tracking-[0.16em] text-[#ffffff]/70">
                 BOARDING PASS
               </span>
@@ -135,7 +135,7 @@ export const BoardingPass = forwardRef<HTMLDivElement, BoardingPassProps>(functi
               <span className="font-mono text-[10px] font-bold tracking-[0.18em] text-[#ffffff]/60">
                 TO
               </span>
-              <span className="font-mono text-[36px] font-bold leading-none tracking-tight text-[#ff385c]">
+              <span className="font-mono text-[34px] font-bold leading-none tracking-tight text-[#ff385c]">
                 {code}
               </span>
               <span className="mt-1 text-[12px] font-normal text-[#ffffff]/75">
@@ -143,36 +143,57 @@ export const BoardingPass = forwardRef<HTMLDivElement, BoardingPassProps>(functi
               </span>
             </div>
           </div>
-        </div>
 
-        {/* 2. Signature Airbnb Rating-Display & Laurel Wreath Block (rating-display-card) */}
-        <div className="flex flex-col items-center border-b border-[#ebebeb] px-6 py-6 text-center">
-          <div className="flex items-center justify-center gap-3.5">
-            <LaurelLeft />
-            <div className="flex flex-col items-center">
-              <span className="ty-micro-label text-[11px] tracking-[0.08em] text-[#6a6a6a] uppercase">
+          {/* Destination Banner Title */}
+          <div className="relative mt-5 flex items-baseline justify-between border-t border-[#ffffff]/15 pt-4">
+            <div className="flex flex-col">
+              <span className="font-mono text-[10px] font-bold tracking-[0.16em] text-[#ffffff]/65">
                 DESTINATION
               </span>
-              <p className="mt-0.5 text-[40px] font-bold leading-[1.1] tracking-[-1px] text-[#222222]">
+              <p className="mt-0.5 text-[30px] font-bold leading-tight tracking-[-0.5px] text-[#ffffff]">
                 {recommendation.country}
               </p>
             </div>
-            <LaurelRight />
-          </div>
-
-          <div className="ty-caption-sm mt-3 flex items-center gap-2 text-[#6a6a6a]">
-            <span className="inline-flex items-center gap-1 font-semibold text-[#222222]">
-              <Star className="size-3.5 fill-[#222222] text-[#222222]" aria-hidden="true" />
-              4.98
+            <span className="rounded-full bg-[#ffffff]/12 px-3 py-1 text-[12px] font-medium text-[#ffffff]/90">
+              {input.travel_style}
             </span>
-            <span>·</span>
-            <span className="font-medium text-[#222222]">성격따라 따라가는 여행 AIRLINES</span>
-            <span>·</span>
-            <span>{input.travel_style}</span>
           </div>
         </div>
 
-        {/* 3. Editorial Meme Title, Reason, and Hashtag Pills (reviews-card / host-card feel) */}
+        {/* 2. Signature Airbnb 64px Rating-Display & Laurel Wreath Block (DESIGN.md rating-display: 64px / 700 / 1.1 / -1px) */}
+        <div className="flex flex-col items-center border-b border-[#ebebeb] px-6 py-6 text-center">
+          <div className="flex items-center justify-center gap-2">
+            <LaurelLeft />
+            <span className="ty-rating-display text-[#222222]">4.98</span>
+            <LaurelRight />
+          </div>
+          <p className="ty-title-md mt-1 text-[#222222]">게스트 선호 여행지 매칭</p>
+          <p className="ty-caption-sm mt-1 text-[#6a6a6a]">
+            {input.my_mbti} 성향과 예산·일정 조건에서 가장 높은 케미를 기록한 여행지예요
+          </p>
+
+          <div className="mt-4 grid w-full grid-cols-3 divide-x divide-[#ebebeb] rounded-[14px] border border-[#ebebeb] bg-[#f7f7f7] py-2.5">
+            <div className="flex flex-col items-center">
+              <span className="ty-micro-label text-[11px] text-[#6a6a6a]">케미 평점</span>
+              <span className="mt-0.5 inline-flex items-center gap-1 text-[13px] font-bold text-[#222222]">
+                <Star className="size-3 fill-[#222222] text-[#222222]" aria-hidden="true" />
+                4.98
+              </span>
+            </div>
+            <div className="flex flex-col items-center">
+              <span className="ty-micro-label text-[11px] text-[#6a6a6a]">성향 매칭</span>
+              <span className="mt-0.5 font-mono text-[13px] font-bold text-[#222222]">
+                {input.my_mbti}
+              </span>
+            </div>
+            <div className="flex flex-col items-center">
+              <span className="ty-micro-label text-[11px] text-[#6a6a6a]">공항 코드</span>
+              <span className="mt-0.5 font-mono text-[13px] font-bold text-[#222222]">{code}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* 3. Editorial Meme Title, Reason, and Hashtag Pills */}
         <div className="flex flex-col gap-3.5 px-6 py-6">
           <h2 className="ty-display-sm text-balance leading-[1.32] text-[#222222]">
             “{recommendation.meme_title}”
@@ -219,7 +240,7 @@ export const BoardingPass = forwardRef<HTMLDivElement, BoardingPassProps>(functi
               ))}
             </div>
             <div className="flex flex-col items-end font-mono text-[10px] leading-tight text-[#6a6a6a]">
-              <span>BOARDING PASS</span>
+              <span>성격따라 따라가는 여행 AIRLINES</span>
               <span className="mt-0.5 font-bold text-[#222222]">ISSUED · {date}</span>
             </div>
           </div>

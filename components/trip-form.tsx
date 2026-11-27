@@ -50,6 +50,8 @@ const COMPANION_ICONS: Record<Companion, string> = {
   가족: '👨‍👩‍👧‍👦',
 }
 
+type StepIndex = 1 | 2 | 3 | 4 | 5 | 6
+
 export function TripForm() {
   const router = useRouter()
   const { setResult, showToast } = useTrip()
@@ -59,6 +61,7 @@ export function TripForm() {
   const [duration, setDuration] = useState<Duration | null>(null)
   const [companion, setCompanion] = useState<Companion | null>(null)
   const [companionMbti, setCompanionMbti] = useState<CompanionMbti | null>(null)
+  const [activeStep, setActiveStep] = useState<StepIndex | 'all'>(1)
   const [submitting, setSubmitting] = useState(false)
   const inFlight = useRef(false)
 
@@ -82,9 +85,37 @@ export function TripForm() {
       (!needsCompanionMbti || companionMbti),
   )
 
+  const handleSelectStyle = (val: TravelStyle) => {
+    setTravelStyle(val)
+    if (!myMbti) setActiveStep(2)
+  }
+
+  const handleSelectMyMbti = (val: Mbti) => {
+    setMyMbti(val)
+    if (!budget) setActiveStep(3)
+  }
+
+  const handleSelectBudget = (val: Budget) => {
+    setBudget(val)
+    if (!duration) setActiveStep(4)
+  }
+
+  const handleSelectDuration = (val: Duration) => {
+    setDuration(val)
+    if (!companion) setActiveStep(5)
+  }
+
   const handleCompanion = (value: Companion) => {
     setCompanion(value)
-    if (value === SOLO) setCompanionMbti(null)
+    if (value === SOLO) {
+      setCompanionMbti(null)
+    } else {
+      setActiveStep(6)
+    }
+  }
+
+  const handleSelectCompanionMbti = (val: CompanionMbti) => {
+    setCompanionMbti(val)
   }
 
   const handleResetAll = () => {
@@ -94,6 +125,13 @@ export function TripForm() {
     setDuration(null)
     setCompanion(null)
     setCompanionMbti(null)
+    setActiveStep(1)
+  }
+
+  const isStepOpen = (step: StepIndex) => activeStep === 'all' || activeStep === step
+
+  const toggleStep = (step: StepIndex) => {
+    setActiveStep((prev) => (prev === step ? 'all' : step))
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -141,35 +179,47 @@ export function TripForm() {
 
   return (
     <>
-      <form onSubmit={handleSubmit} className="flex flex-col gap-7 px-6 pt-4 pb-6" noValidate>
-        {/* Airbnb Signature Global Search Bar Pill (64px height, 3 segments, 48x48px Rausch Search Orb) */}
+      <form onSubmit={handleSubmit} className="flex flex-col gap-3.5 px-5 pt-3 pb-6" noValidate>
+        {/* Airbnb Signature Global Search Bar Pill (64px height, 3 clickable segments + 48x48px Rausch Search Orb) */}
         <div
           aria-label="선택된 여행 조건 요약"
           className="flex h-16 items-center justify-between rounded-full border border-[#dddddd] bg-[#ffffff] py-2 pr-2 pl-5 shadow-airbnb"
         >
           <div className="grid flex-1 grid-cols-3 divide-x divide-[#dddddd] pr-2">
-            <div className="flex min-w-0 flex-col pr-2.5">
+            <button
+              type="button"
+              onClick={() => setActiveStep(1)}
+              className="flex min-w-0 flex-col pr-2.5 text-left focus-visible:outline-none"
+            >
               <span className="ty-micro-label text-[11px] text-[#222222]">어디로</span>
               <span className="ty-caption-sm truncate text-[12px] text-[#6a6a6a]">
                 {travelStyle ?? '스타일 선택'}
               </span>
-            </div>
-            <div className="flex min-w-0 flex-col px-2.5">
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveStep(budget ? 4 : 3)}
+              className="flex min-w-0 flex-col px-2.5 text-left focus-visible:outline-none"
+            >
               <span className="ty-micro-label text-[11px] text-[#222222]">일정 · 예산</span>
               <span className="ty-caption-sm truncate text-[12px] text-[#6a6a6a]">
                 {duration || budget
                   ? [duration, budget].filter(Boolean).join(' · ')
                   : '기간 · 예산'}
               </span>
-            </div>
-            <div className="flex min-w-0 flex-col pl-2.5">
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveStep(myMbti ? 5 : 2)}
+              className="flex min-w-0 flex-col pl-2.5 text-left focus-visible:outline-none"
+            >
               <span className="ty-micro-label text-[11px] text-[#222222]">누구와</span>
               <span className="ty-caption-sm truncate text-[12px] text-[#6a6a6a]">
                 {myMbti || companion
                   ? [myMbti, companion].filter(Boolean).join(' · ')
                   : 'MBTI · 동행'}
               </span>
-            </div>
+            </button>
           </div>
           <button
             type="submit"
@@ -181,70 +231,99 @@ export function TripForm() {
           </button>
         </div>
 
+        {/* Mode Switcher: Step-by-Step Accordion vs Expand All */}
+        <div className="flex items-center justify-between px-1 pt-1">
+          <span className="ty-caption-sm text-[#6a6a6a]">
+            카드를 눌러 단계별로 조건을 선택해 보세요
+          </span>
+          <button
+            type="button"
+            onClick={() => setActiveStep((prev) => (prev === 'all' ? 1 : 'all'))}
+            className="ty-caption-sm font-semibold text-[#222222] underline underline-offset-4 hover:text-[#6a6a6a]"
+          >
+            {activeStep === 'all' ? '단계별로 보기' : '전체 펼쳐보기'}
+          </button>
+        </div>
+
         {/* 01. Travel Style - Airbnb Icon Cards */}
         <ChoiceGroup
           name="travel_style"
           step="01"
-          legend="여행 스타일"
+          collapsedLabel="여행 스타일"
+          legend="어디서 무엇을 하고 싶나요?"
           subtitle="가장 끌리는 여행 테마 1가지를 골라주세요"
           options={TRAVEL_STYLES}
           value={travelStyle}
-          onChange={setTravelStyle}
+          onChange={handleSelectStyle}
           columns={2}
           variant="card-icon"
           iconMap={STYLE_ICONS}
           descMap={STYLE_DESC}
+          open={isStepOpen(1)}
+          onToggle={() => toggleStep(1)}
         />
 
         {/* 02. My MBTI - Airbnb Calendar-style Ink Invert Tiles */}
         <ChoiceGroup
           name="my_mbti"
           step="02"
-          legend="본인 MBTI"
+          collapsedLabel="본인 MBTI"
+          legend="본인의 MBTI는 무엇인가요?"
           subtitle="성향에 딱 맞는 밈과 여행지를 매칭해 드려요"
           options={MBTI_TYPES}
           value={myMbti}
-          onChange={setMyMbti}
+          onChange={handleSelectMyMbti}
           columns={4}
           mono
           variant="mbti-tile"
+          open={isStepOpen(2)}
+          onToggle={() => toggleStep(2)}
         />
 
         {/* 03. Budget - Airbnb Filter Pills */}
         <ChoiceGroup
           name="budget"
           step="03"
-          legend="예산 (1인)"
+          collapsedLabel="예산 (1인)"
+          legend="1인 기준 예산은 어느 정도인가요?"
           subtitle="항공권과 숙소를 포함한 현실적인 예산 구간"
           options={BUDGETS}
           value={budget}
-          onChange={setBudget}
+          onChange={handleSelectBudget}
           variant="pill"
+          open={isStepOpen(3)}
+          onToggle={() => toggleStep(3)}
         />
 
         {/* 04. Duration - Airbnb Filter Pills */}
         <ChoiceGroup
           name="duration"
           step="04"
-          legend="기간"
+          collapsedLabel="기간"
+          legend="얼마나 떠나 있을 예정인가요?"
           subtitle="일정에 무리 없는 비행 거리의 국가를 골라드려요"
           options={DURATIONS}
           value={duration}
-          onChange={setDuration}
+          onChange={handleSelectDuration}
           variant="pill"
+          open={isStepOpen(4)}
+          onToggle={() => toggleStep(4)}
         />
 
         {/* 05. Companion - Airbnb Icon Pills */}
         <ChoiceGroup
           name="companion"
           step="05"
-          legend="동행자"
+          collapsedLabel="동행자"
+          legend="누구와 함께 떠나나요?"
           subtitle="동행자와의 케미를 보딩패스에 녹여드려요"
           options={COMPANIONS}
           value={companion}
           onChange={handleCompanion}
           variant="pill"
           iconMap={COMPANION_ICONS}
+          open={isStepOpen(5)}
+          onToggle={() => toggleStep(5)}
         />
 
         {/* 06. Companion MBTI - Conditional Ink Invert Tiles */}
@@ -252,19 +331,22 @@ export function TripForm() {
           <ChoiceGroup
             name="companion_mbti"
             step="06"
-            legend="동행자 MBTI"
+            collapsedLabel="동행자 MBTI"
+            legend="동행자의 MBTI도 알고 계신가요?"
             subtitle="잘 모르시면 '모름'을 선택해도 재미있게 발권돼요"
             options={COMPANION_MBTI_TYPES}
             value={companionMbti}
-            onChange={setCompanionMbti}
+            onChange={handleSelectCompanionMbti}
             columns={4}
             mono
             variant="mbti-tile"
+            open={isStepOpen(6)}
+            onToggle={() => toggleStep(6)}
           />
         )}
 
         {/* Airbnb Sticky Bottom Reservation Bar */}
-        <div className="sticky bottom-0 -mx-6 flex flex-col gap-2.5 border-t border-[#dddddd] bg-[#ffffff]/95 px-6 pt-3.5 pb-4 backdrop-blur">
+        <div className="sticky bottom-0 -mx-5 mt-2 flex flex-col gap-2.5 border-t border-[#dddddd] bg-[#ffffff]/95 px-6 pt-3.5 pb-4 backdrop-blur">
           <div className="flex items-center justify-between">
             <div className="flex flex-col">
               <div className="flex items-baseline gap-1.5">
@@ -295,7 +377,7 @@ export function TripForm() {
                 className="ty-caption-sm inline-flex items-center gap-1 font-medium text-[#222222] underline underline-offset-4 hover:text-[#6a6a6a]"
               >
                 <RotateCcw className="size-3.5" aria-hidden="true" />
-                초기화
+                전체 초기화
               </button>
             )}
           </div>
